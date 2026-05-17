@@ -6,6 +6,21 @@ local LocalPlayer = Players.LocalPlayer
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
 
+-- الملاحظة
+local Notice = Instance.new("TextLabel")
+Notice.Parent = ScreenGui
+Notice.Size = UDim2.new(0,500,0,50)
+Notice.Position = UDim2.new(0.5,-250,0,120)
+Notice.BackgroundTransparency = 1
+Notice.Text = "ملاحظة : لازم تدوس 10 مرات وانت داخل القيم على الكشف حتى يبين القاتل والشريف"
+Notice.TextColor3 = Color3.fromRGB(0,255,0)
+Notice.TextScaled = true
+Notice.Font = Enum.Font.GothamBold
+
+task.delay(15,function()
+	Notice:Destroy()
+end)
+
 -- متغير اظهار الازرار
 local Open = false
 
@@ -130,79 +145,5 @@ MainButton.MouseButton1Click:Connect(function()
 	ESPButton.Visible = Open
 	FlyButton.Visible = Open
 	SpeedButton.Visible = Open
-
-end)
-
--- كشف اللاعبين
-ESPButton.MouseButton1Click:Connect(function()
-
-	for _,v in pairs(Players:GetPlayers()) do
-		if v ~= LocalPlayer and v.Character then
-
-			local Highlight = Instance.new("Highlight")
-			Highlight.Parent = v.Character
-
-			if v.Backpack:FindFirstChild("Knife") or v.Character:FindFirstChild("Knife") then
-				Highlight.FillColor = Color3.fromRGB(255,0,0)
-
-			elseif v.Backpack:FindFirstChild("Gun") or v.Character:FindFirstChild("Gun") then
-				Highlight.FillColor = Color3.fromRGB(0,0,255)
-
-			else
-				Highlight.FillColor = Color3.fromRGB(0,255,0)
-			end
-
-			Highlight.OutlineColor = Color3.fromRGB(255,255,255)
-		end
-	end
-end)
-
--- الطيران
-local Flying = false
-
-FlyButton.MouseButton1Click:Connect(function()
-
-	Flying = not Flying
-
-	local Character = LocalPlayer.Character
-
-	if Character and Character:FindFirstChild("HumanoidRootPart") then
-
-		local HRP = Character.HumanoidRootPart
-
-		if Flying then
-
-			local BV = Instance.new("BodyVelocity")
-			BV.Name = "FlyForce"
-			BV.MaxForce = Vector3.new(999999,999999,999999)
-			BV.Velocity = Vector3.new(0,0,0)
-			BV.Parent = HRP
-
-			RunService.RenderStepped:Connect(function()
-
-				if Flying and HRP:FindFirstChild("FlyForce") then
-					HRP.FlyForce.Velocity = workspace.CurrentCamera.CFrame.LookVector * 60
-				end
-
-			end)
-
-		else
-
-			if HRP:FindFirstChild("FlyForce") then
-				HRP.FlyForce:Destroy()
-			end
-
-		end
-	end
-end)
-
--- السرعة
-SpeedButton.MouseButton1Click:Connect(function()
-
-	local Character = LocalPlayer.Character
-
-	if Character and Character:FindFirstChild("Humanoid") then
-		Character.Humanoid.WalkSpeed = 50
-	end
 
 end)
