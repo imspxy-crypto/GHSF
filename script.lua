@@ -153,6 +153,19 @@ NoclipButton.BorderSizePixel = 0
 local Corner6 = Instance.new("UICorner")
 Corner6.Parent = NoclipButton
 Corner6.CornerRadius = UDim.new(0,15)
+-- اظهار واخفاء الازرار
+MainButton.MouseButton1Click:Connect(function()
+
+	Open = not Open
+
+	ESPButton.Visible = Open
+	FlyButton.Visible = Open
+	SpeedButton.Visible = Open
+	InfiniteJumpButton.Visible = Open
+	NoclipButton.Visible = Open
+
+end)
+
 
 -- Infinite Jump
 local InfiniteJumpEnabled = false
