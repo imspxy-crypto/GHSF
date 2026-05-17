@@ -1,25 +1,11 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
-
--- الملاحظة
-local Notice = Instance.new("TextLabel")
-Notice.Parent = ScreenGui
-Notice.Size = UDim2.new(0,500,0,50)
-Notice.Position = UDim2.new(0.5,-250,0,120)
-Notice.BackgroundTransparency = 1
-Notice.Text = "ملاحظة : لازم تدوس 10 مرات وانت داخل القيم على الكشف حتى يبين القاتل والشريف"
-Notice.TextColor3 = Color3.fromRGB(0,255,0)
-Notice.TextScaled = true
-Notice.Font = Enum.Font.GothamBold
-
-task.delay(15,function()
-	Notice:Destroy()
-end)
 
 -- متغير اظهار الازرار
 local Open = false
@@ -67,7 +53,7 @@ MainButton.InputChanged:Connect(function(input)
 	end
 end)
 
-game:GetService("UserInputService").InputChanged:Connect(function(input)
+UserInputService.InputChanged:Connect(function(input)
 
 	if input == dragInput and dragging then
 
@@ -137,6 +123,40 @@ local Corner4 = Instance.new("UICorner")
 Corner4.Parent = SpeedButton
 Corner4.CornerRadius = UDim.new(0,15)
 
+-- زر Infinite Jump
+local InfiniteJumpButton = Instance.new("TextButton")
+InfiniteJumpButton.Parent = ScreenGui
+InfiniteJumpButton.Size = UDim2.new(0,180,0,45)
+InfiniteJumpButton.Position = UDim2.new(0.5,-90,0,235)
+InfiniteJumpButton.BackgroundColor3 = Color3.fromRGB(20,20,20)
+InfiniteJumpButton.Text = "Infinite Jump"
+InfiniteJumpButton.TextColor3 = Color3.fromRGB(255,255,255)
+InfiniteJumpButton.TextScaled = true
+InfiniteJumpButton.Font = Enum.Font.GothamBold
+InfiniteJumpButton.Visible = false
+InfiniteJumpButton.BorderSizePixel = 0
+
+local Corner5 = Instance.new("UICorner")
+Corner5.Parent = InfiniteJumpButton
+Corner5.CornerRadius = UDim.new(0,15)
+
+-- زر Noclip
+local NoclipButton = Instance.new("TextButton")
+NoclipButton.Parent = ScreenGui
+NoclipButton.Size = UDim2.new(0,180,0,45)
+NoclipButton.Position = UDim2.new(0.5,-90,0,290)
+NoclipButton.BackgroundColor3 = Color3.fromRGB(20,20,20)
+NoclipButton.Text = "Noclip"
+NoclipButton.TextColor3 = Color3.fromRGB(255,255,255)
+NoclipButton.TextScaled = true
+NoclipButton.Font = Enum.Font.GothamBold
+NoclipButton.Visible = false
+NoclipButton.BorderSizePixel = 0
+
+local Corner6 = Instance.new("UICorner")
+Corner6.Parent = NoclipButton
+Corner6.CornerRadius = UDim.new(0,15)
+
 -- اظهار واخفاء الازرار
 MainButton.MouseButton1Click:Connect(function()
 
@@ -145,5 +165,52 @@ MainButton.MouseButton1Click:Connect(function()
 	ESPButton.Visible = Open
 	FlyButton.Visible = Open
 	SpeedButton.Visible = Open
+	InfiniteJumpButton.Visible = Open
+	NoclipButton.Visible = Open
 
+end)
+
+-- Infinite Jump
+local InfiniteJumpEnabled = false
+
+InfiniteJumpButton.MouseButton1Click:Connect(function()
+	InfiniteJumpEnabled = not InfiniteJumpEnabled
+	
+	if InfiniteJumpEnabled then
+		InfiniteJumpButton.Text = "Infinite Jump ON"
+	else
+		InfiniteJumpButton.Text = "Infinite Jump OFF"
+	end
+end)
+
+UserInputService.JumpRequest:Connect(function()
+	if InfiniteJumpEnabled then
+		local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+	end
+end)
+
+-- Noclip
+local NoclipEnabled = false
+
+NoclipButton.MouseButton1Click:Connect(function()
+	NoclipEnabled = not NoclipEnabled
+	
+	if NoclipEnabled then
+		NoclipButton.Text = "Noclip ON"
+	else
+		NoclipButton.Text = "Noclip OFF"
+	end
+end)
+
+RunService.Stepped:Connect(function()
+	if NoclipEnabled and LocalPlayer.Character then
+		for _, v in pairs(LocalPlayer.Character:GetDescendants()) do
+			if v:IsA("BasePart") then
+				v.CanCollide = false
+			end
+		end
+	end
 end)
