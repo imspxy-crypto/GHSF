@@ -1,6 +1,5 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -53,7 +52,7 @@ MainButton.InputChanged:Connect(function(input)
 	end
 end)
 
-UserInputService.InputChanged:Connect(function(input)
+game:GetService("UserInputService").InputChanged:Connect(function(input)
 
 	if input == dragInput and dragging then
 
@@ -123,39 +122,90 @@ local Corner4 = Instance.new("UICorner")
 Corner4.Parent = SpeedButton
 Corner4.CornerRadius = UDim.new(0,15)
 
--- زر Infinite Jump
-local InfiniteJumpButton = Instance.new("TextButton")
-InfiniteJumpButton.Parent = ScreenGui
-InfiniteJumpButton.Size = UDim2.new(0,180,0,45)
-InfiniteJumpButton.Position = UDim2.new(0.5,-90,0,235)
-InfiniteJumpButton.BackgroundColor3 = Color3.fromRGB(20,20,20)
-InfiniteJumpButton.Text = "Infinite Jump"
-InfiniteJumpButton.TextColor3 = Color3.fromRGB(255,255,255)
-InfiniteJumpButton.TextScaled = true
-InfiniteJumpButton.Font = Enum.Font.GothamBold
-InfiniteJumpButton.Visible = false
-InfiniteJumpButton.BorderSizePixel = 0
+-- اظهار واخفاء الازرار
+MainButton.MouseButton1Click:Connect(function()
 
-local Corner5 = Instance.new("UICorner")
-Corner5.Parent = InfiniteJumpButton
-Corner5.CornerRadius = UDim.new(0,15)
+	Open = not Open
 
--- زر Noclip
-local NoclipButton = Instance.new("TextButton")
-NoclipButton.Parent = ScreenGui
-NoclipButton.Size = UDim2.new(0,180,0,45)
-NoclipButton.Position = UDim2.new(0.5,-90,0,290)
-NoclipButton.BackgroundColor3 = Color3.fromRGB(20,20,20)
-NoclipButton.Text = "Noclip"
-NoclipButton.TextColor3 = Color3.fromRGB(255,255,255)
-NoclipButton.TextScaled = true
-NoclipButton.Font = Enum.Font.GothamBold
-NoclipButton.Visible = false
-NoclipButton.BorderSizePixel = 0
+	ESPButton.Visible = Open
+	FlyButton.Visible = Open
+	SpeedButton.Visible = Open
 
-local Corner6 = Instance.new("UICorner")
-Corner6.Parent = NoclipButton
-Corner6.CornerRadius = UDim.new(0,15)
+end)
+
+-- كشف اللاعبين
+ESPButton.MouseButton1Click:Connect(function()
+
+	for _,v in pairs(Players:GetPlayers()) do
+		if v ~= LocalPlayer and v.Character then
+
+			local Highlight = Instance.new("Highlight")
+			Highlight.Parent = v.Character
+
+			if v.Backpack:FindFirstChild("Knife") or v.Character:FindFirstChild("Knife") then
+				Highlight.FillColor = Color3.fromRGB(255,0,0)
+
+			elseif v.Backpack:FindFirstChild("Gun") or v.Character:FindFirstChild("Gun") then
+				Highlight.FillColor = Color3.fromRGB(0,0,255)
+
+			else
+				Highlight.FillColor = Color3.fromRGB(0,255,0)
+			end
+
+			Highlight.OutlineColor = Color3.fromRGB(255,255,255)
+		end
+	end
+end)
+
+-- الطيران
+local Flying = false
+
+FlyButton.MouseButton1Click:Connect(function()
+
+	Flying = not Flying
+
+	local Character = LocalPlayer.Character
+
+	if Character and Character:FindFirstChild("HumanoidRootPart") then
+
+		local HRP = Character.HumanoidRootPart
+
+		if Flying then
+
+			local BV = Instance.new("BodyVelocity")
+			BV.Name = "FlyForce"
+			BV.MaxForce = Vector3.new(999999,999999,999999)
+			BV.Velocity = Vector3.new(0,0,0)
+			BV.Parent = HRP
+
+			RunService.RenderStepped:Connect(function()
+
+				if Flying and HRP:FindFirstChild("FlyForce") then
+					HRP.FlyForce.Velocity = workspace.CurrentCamera.CFrame.LookVector * 60
+				end
+
+			end)
+
+		else
+
+			if HRP:FindFirstChild("FlyForce") then
+				HRP.FlyForce:Destroy()
+			end
+
+		end
+	end
+end)
+
+-- السرعة
+SpeedButton.MouseButton1Click:Connect(function()
+
+	local Character = LocalPlayer.Character
+
+	if Character and Character:FindFirstChild("Humanoid") then
+		Character.Humanoid.WalkSpeed = 50
+	end
+
+end)
 
 -- اظهار واخفاء الازرار
 MainButton.MouseButton1Click:Connect(function()
@@ -174,18 +224,23 @@ end)
 local InfiniteJumpEnabled = false
 
 InfiniteJumpButton.MouseButton1Click:Connect(function()
+
 	InfiniteJumpEnabled = not InfiniteJumpEnabled
-	
+
 	if InfiniteJumpEnabled then
 		InfiniteJumpButton.Text = "Infinite Jump ON"
 	else
 		InfiniteJumpButton.Text = "Infinite Jump OFF"
 	end
+
 end)
 
 UserInputService.JumpRequest:Connect(function()
+
 	if InfiniteJumpEnabled then
+
 		local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+
 		if humanoid then
 			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 		end
@@ -196,18 +251,23 @@ end)
 local NoclipEnabled = false
 
 NoclipButton.MouseButton1Click:Connect(function()
+
 	NoclipEnabled = not NoclipEnabled
-	
+
 	if NoclipEnabled then
 		NoclipButton.Text = "Noclip ON"
 	else
 		NoclipButton.Text = "Noclip OFF"
 	end
+
 end)
 
 RunService.Stepped:Connect(function()
+
 	if NoclipEnabled and LocalPlayer.Character then
-		for _, v in pairs(LocalPlayer.Character:GetDescendants()) do
+
+		for _,v in pairs(LocalPlayer.Character:GetDescendants()) do
+
 			if v:IsA("BasePart") then
 				v.CanCollide = false
 			end
